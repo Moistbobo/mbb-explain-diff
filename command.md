@@ -4,9 +4,9 @@ description: Explain a code change as a self-contained HTML page with background
   or /explain-diff --pr <url>.
 ---
 
-# /explain-diff
+# /explain-diff (OpenCode)
 
-Run the explain-diff skill. Produce a rich, interactive, offline-capable HTML explanation of the specified code change.
+This file is the OpenCode slash command entrypoint for the explain-diff skill. It delegates to the agent-agnostic `skill/` directory in this repo, which can also be used with other harnesses like Claude Code and Codex.
 
 ## What to do
 
@@ -15,8 +15,8 @@ Run the explain-diff skill. Produce a rich, interactive, offline-capable HTML ex
    - `/explain-diff <branch>` → explain the diff between the current branch and `<branch>`.
    - `/explain-diff <commit-range>` → explain that commit range.
    - `/explain-diff --pr <url>` → fetch and explain the PR diff.
-2. Load the explain-diff skill instructions from `~/.agents/skills/explain-diff/SKILL.md`.
-3. Follow the skill workflow: explore the surrounding code, build a narrative, produce a JSON content spec, redact secrets, render with `~/.agents/skills/explain-diff/render.py`, validate, and return the absolute file path.
+2. Load the explain-diff skill instructions from `~/.agents/skills/explain-diff/SKILL.md` (or the equivalent path in the active skill root).
+3. Follow the skill workflow: explore the surrounding code, build a narrative, produce a JSON content spec, redact secrets, render with the skill's `render.py`, validate, and return the absolute file path.
 
 ## Output
 

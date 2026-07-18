@@ -7,11 +7,11 @@ description: Manual-only skill triggered by /explain-diff. Produces a self-conta
 
 Create a rich, interactive, self-contained HTML explanation of a specified code change.
 
-This skill is **manual-only**. It is triggered by the user typing `/explain-diff` with an optional argument. The slash command is registered in `~/.config/opencode/commands/explain-diff.md`; that command delegates to this skill. The skill does not run automatically on checkout, diff, branch change, or PR open.
+This skill is **manual-only**. It is invoked by the user with `/explain-diff` (on OpenCode and Claude Code) or selected by name/description on other harnesses that support `SKILL.md` skills. The skill does not run automatically on checkout, diff, branch change, or PR open.
 
 ## Invocation
 
-In the OpenCode terminal, run one of:
+Once the skill is installed in your agent harness, run one of:
 
 ```
 /explain-diff                    # Explain working-tree diff against HEAD
@@ -65,7 +65,7 @@ The file must have no external dependencies: all CSS, JavaScript, fonts, and ass
    - For the Code section, prefer the structured object form so `render.py` can build a “Files changed” table and group the walkthrough by concept. Populate `files` by reading the diff and the relevant source files; include project-relative paths and accurate line ranges.
    - **Self-correct the quiz options for length balance.** After drafting all quiz questions, measure the character length of each option. If the correct option is the longest (or tied for longest), rewrite the question—shorten the correct option, or add a short parallel qualifier to the shorter distractors—until the correct answer is not identifiable by length. Re-check the whole set before rendering.
 5. **Redact secrets.** Scan code, diff text, and examples for API keys, tokens, passwords, and other high-entropy strings. Never include them in the generated file. Replace them with placeholders like `<REDACTED>` or remove them.
-6. **Render.** Run `render.py` from the skill directory, passing the content spec. The renderer will populate `template.html`, shuffle quiz options, auto-balance any remaining length bias in quiz options, validate safety constraints, and write the final file.
+6. **Render.** Run `render.py` from this skill's directory, passing the content spec. The renderer will populate `template.html`, shuffle quiz options, auto-balance any remaining length bias in quiz options, validate safety constraints, and write the final file.
 7. **Validate.** Confirm the file exists, is valid HTML5, contains no external assets, has working quiz interactions, and satisfies all code-block and quiz constraints below.
 8. **Hand off.** Return the absolute path as a clickable `file://` link, plus a one-sentence summary of what was inspected and any assumptions made.
 

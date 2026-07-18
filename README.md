@@ -1,10 +1,10 @@
 # mbb-explain-diff
 
-A self-contained, offline-capable HTML explainer for code changes, designed for use as an [OpenCode](https://opencode.ai/) slash command.
+A self-contained, offline-capable HTML explainer for code changes. It works as a portable skill for agent harnesses that support skill directories with a `SKILL.md` entrypoint.
 
 ## What it does
 
-`/explain-diff` turns a diff, branch comparison, commit range, or PR diff into a single HTML file with:
+`explain-diff` turns a diff, branch comparison, commit range, or PR diff into a single HTML file with:
 
 - **Background** — the system context needed to understand the change
 - **Intuition** — the core idea before implementation details
@@ -23,29 +23,56 @@ You can preview a generated example here:
 
 > When using [hyouji](https://www.hyouji.moe/) to preview, you must allow scripts for the quiz interactions to work.
 
-## Install
+## Supported harnesses
 
-1. Clone this repo somewhere on your machine:
-   ```bash
-   git clone https://github.com/Moistbobo/mbb-explain-diff.git
-   ```
+The skill itself (`skill/` in this repo) uses the common `SKILL.md` + supporting files layout, which is recognized by multiple agent tools. Where applicable, the slash command is also provided.
 
-2. Symlink the command file into OpenCode:
-   ```bash
-   ln -s "$(pwd)/mbb-explain-diff/command.md" ~/.config/opencode/commands/explain-diff.md
-   ```
+### OpenCode
 
-3. Symlink the skill directory into `~/.agents/skills/`:
-   ```bash
-   ln -s "$(pwd)/mbb-explain-diff/skill" ~/.agents/skills/explain-diff
-   ```
+Symlink the command file and the skill directory:
 
-4. In OpenCode, run:
-   ```
-   /explain-diff
-   ```
+```bash
+ln -s "$(pwd)/mbb-explain-diff/command.md" ~/.config/opencode/commands/explain-diff.md
+ln -s "$(pwd)/mbb-explain-diff/skill" ~/.agents/skills/explain-diff
+```
+
+Then run:
+
+```
+/explain-diff
+```
+
+### Claude Code
+
+Symlink the skill directory:
+
+```bash
+ln -s "$(pwd)/mbb-explain-diff/skill" ~/.claude/skills/explain-diff
+```
+
+Then run:
+
+```
+/explain-diff
+```
+
+### Codex
+
+Symlink the skill directory into `~/.agents/skills/` (or a repo-level `.codex/skills/`):
+
+```bash
+ln -s "$(pwd)/mbb-explain-diff/skill" ~/.agents/skills/explain-diff
+```
+
+Codex will load the skill by name/description and use it when the task matches.
+
+### Pi
+
+Pi has no public skill/instruction harness, so this skill cannot be used with Pi directly.
 
 ## Usage
+
+Once installed in your agent harness:
 
 ```
 /explain-diff                    # Explain working-tree diff against HEAD
@@ -59,6 +86,20 @@ The rendered file is saved to:
 ```
 <project-root>/tmp/explain-diff/YYYY-MM-DD-NN-<slug>.html
 ```
+
+## Repo layout
+
+```
+mbb-explain-diff/
+├── README.md
+├── command.md          # OpenCode slash command definition
+└── skill/
+    ├── SKILL.md        # Portable skill instructions
+    ├── render.py       # HTML renderer
+    └── template.html   # Inline HTML template
+```
+
+`command.md` is only needed for OpenCode. The `skill/` directory is the agent-agnostic part.
 
 ## Credits
 
