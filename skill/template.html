@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{TITLE}}</title>
+  <style>
+    :root {
+      --font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --bg: #ffffff;
+      --bg-muted: #f6f8fa;
+      --text: #1f2328;
+      --text-muted: #59636e;
+      --border: #d1d9e0;
+      --accent: #0969da;
+      --accent-soft: #ddf4ff;
+      --success: #1a7f37;
+      --success-soft: #dafbe1;
+      --error: #cf222e;
+      --error-soft: #ffebe9;
+      --warning: #9a6700;
+      --warning-soft: #fff8c5;
+      --callout: #f6f8fa;
+      --shadow: 0 1px 2px rgba(31, 35, 40, 0.04), 0 1px 3px rgba(31, 35, 40, 0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0d1117;
+      --bg-muted: #161b22;
+      --text: #c9d1d9;
+      --text-muted: #8b949e;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --accent-soft: #121d2f;
+      --success: #3fb950;
+      --success-soft: #122117;
+      --error: #f85149;
+      --error-soft: #251515;
+      --warning: #d29922;
+      --warning-soft: #1d1a0f;
+      --callout: #161b22;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.32);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      [data-theme="system"] {
+        --bg: #0d1117;
+        --bg-muted: #161b22;
+        --text: #c9d1d9;
+        --text-muted: #8b949e;
+        --border: #30363d;
+        --accent: #58a6ff;
+        --accent-soft: #121d2f;
+        --success: #3fb950;
+        --success-soft: #122117;
+        --error: #f85149;
+        --error-soft: #251515;
+        --warning: #d29922;
+        --warning-soft: #1d1a0f;
+        --callout: #161b22;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.32);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 0.5rem 1rem;
+      z-index: 100;
+      transition: top 0.15s;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      z-index: 20;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.25rem;
+    }
+
+    .theme-toggle button {
+      border: 0;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .theme-toggle button[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .sidebar-toggle {
+      display: none;
+      border: 1px solid var(--border);
+      background: var(--bg-muted);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+
+    .sidebar-toggle svg {
+      display: block;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .page {
+      display: flex;
+      min-height: calc(100vh - 56px);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 56px;
+      align-self: flex-start;
+      width: 240px;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--bg);
+      padding: 1.25rem 0;
+      z-index: 10;
+    }
+
+    .sidebar-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      padding: 0 1.25rem 0.75rem;
+      margin: 0;
+    }
+
+    .sidebar-nav {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sidebar-nav li {
+      margin: 0;
+    }
+
+    .sidebar-nav a {
+      display: block;
+      padding: 0.5rem 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+      border-left: 3px solid transparent;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .sidebar-nav a:hover {
+      background: var(--bg-muted);
+    }
+
+    .sidebar-nav a.active {
+      border-left-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .layout {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2rem 2.5rem 4rem;
+    }
+
+    .summary {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 2rem;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+      scroll-margin-top: 72px;
+    }
+
+    section h2 {
+      font-size: 1.6rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    section h3 {
+      font-size: 1.25rem;
+      margin-top: 1.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin: 0.75rem 0;
+    }
+
+    ul, ol {
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin: 0.35rem 0;
+    }
+
+    .callout {
+      background: var(--callout);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+
+    .callout.warning {
+      border-left-color: var(--warning);
+      background: var(--warning-soft);
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .callout.danger {
+      border-left-color: var(--error);
+      background: var(--error-soft);
+    }
+
+    .callout-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    pre {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      white-space: pre;
+      word-wrap: normal;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+    }
+
+    pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    :not(pre) > code {
+      background: var(--bg-muted);
+      padding: 0.15em 0.35em;
+      border-radius: 4px;
+    }
+
+    .files-table {
+      margin: 1rem 0 1.5rem;
+      font-size: 0.95rem;
+    }
+
+    .files-table th:first-child,
+    .files-table td:first-child {
+      font-family: var(--font-mono);
+    }
+
+    .diagram {
+      background: var(--callout);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .diagram-caption {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+    }
+
+    .before-after {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    @media (min-width: 640px) {
+      .before-after {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem;
+    }
+
+    .panel-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.5rem;
+      color: var(--text-muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-muted);
+      font-weight: 600;
+    }
+
+    .quiz {
+      margin-top: 1.5rem;
+    }
+
+    .quiz-question {
+      background: var(--callout);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .quiz-question h4 {
+      margin: 0 0 1rem 0;
+      font-size: 1.1rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease;
+    }
+
+    .quiz-option:hover:not(.disabled) {
+      border-color: var(--accent);
+    }
+
+    .quiz-option input {
+      margin-top: 0.15rem;
+      cursor: pointer;
+    }
+
+    .quiz-option-label {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error);
+      background: var(--error-soft);
+    }
+
+    .quiz-option.disabled {
+      cursor: default;
+    }
+
+    .quiz-feedback {
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .quiz-feedback.visible {
+      display: block;
+    }
+
+    .quiz-feedback.correct {
+      background: var(--success-soft);
+      border: 1px solid var(--success);
+    }
+
+    .quiz-feedback.incorrect {
+      background: var(--error-soft);
+      border: 1px solid var(--error);
+    }
+
+    .quiz-summary {
+      margin-top: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      display: none;
+    }
+
+    .quiz-summary.visible {
+      display: block;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      left: -10000px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 860px) {
+      .sidebar {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+        box-shadow: var(--shadow);
+        border-right: 0;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-toggle {
+        display: block;
+      }
+
+      .layout {
+        padding: 1.5rem 1rem 3rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        flex-wrap: wrap;
+      }
+
+      header h1 {
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a href="#content" class="skip-link">Skip to content</a>
+
+  <header>
+    <h1>{{TITLE}}</h1>
+    <div class="header-actions">
+      <div class="theme-toggle" role="group" aria-label="Theme">
+        <button data-mode="light" aria-pressed="false">Light</button>
+        <button data-mode="system" aria-pressed="true">System</button>
+        <button data-mode="dark" aria-pressed="false">Dark</button>
+      </div>
+      <button class="sidebar-toggle" aria-label="Open section navigation" aria-expanded="false" aria-controls="sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="page">
+    <aside id="sidebar" class="sidebar" aria-label="Sections">
+      <p class="sidebar-title">On this page</p>
+      <ul class="sidebar-nav">
+        <li><a href="#background">Background</a></li>
+        <li><a href="#intuition">Intuition</a></li>
+        <li><a href="#code">Code walkthrough</a></li>
+        {{TRADE_OFFS_SIDEBAR}}
+        <li><a href="#quiz">Quiz</a></li>
+      </ul>
+    </aside>
+
+    <main id="content" class="layout">
+      <p class="summary">{{SUMMARY}}</p>
+
+      <section id="background" aria-labelledby="background-heading">
+        <h2 id="background-heading">Background</h2>
+        {{BACKGROUND}}
+      </section>
+
+      <section id="intuition" aria-labelledby="intuition-heading">
+        <h2 id="intuition-heading">Intuition</h2>
+        {{INTUITION}}
+      </section>
+
+      <section id="code" aria-labelledby="code-heading">
+        <h2 id="code-heading">Code walkthrough</h2>
+        {{CODE}}
+      </section>
+
+      {{TRADE_OFFS_SECTION}}
+
+      <section id="quiz" aria-labelledby="quiz-heading">
+        <h2 id="quiz-heading">Quiz</h2>
+        <p>Test your understanding with the questions below. Select one answer per question. Feedback appears after you choose.</p>
+        <div id="quiz-container" class="quiz"></div>
+        <div id="quiz-summary" class="quiz-summary" aria-live="polite"></div>
+        <div id="quiz-announce" class="sr-only" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const STORAGE_KEY = 'explain-diff-theme';
+      const html = document.documentElement;
+      const buttons = document.querySelectorAll('.theme-toggle button');
+
+      function getSystemTheme() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'dark'; // fallback when no preference
+      }
+
+      function applyTheme(mode) {
+        const resolved = mode === 'system' ? getSystemTheme() : mode;
+        html.setAttribute('data-theme', resolved);
+        buttons.forEach(function (btn) {
+          btn.setAttribute('aria-pressed', String(btn.dataset.mode === mode));
+        });
+      }
+
+      function loadTheme() {
+        let saved = null;
+        try {
+          saved = localStorage.getItem(STORAGE_KEY);
+        } catch (e) {
+          saved = null;
+        }
+        return saved || 'system';
+      }
+
+      function saveTheme(mode) {
+        try {
+          localStorage.setItem(STORAGE_KEY, mode);
+        } catch (e) {
+          // silently ignore file:// / private-mode storage errors
+        }
+      }
+
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const mode = btn.dataset.mode;
+          applyTheme(mode);
+          saveTheme(mode);
+        });
+      });
+
+      const initialMode = loadTheme();
+      applyTheme(initialMode);
+
+      if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.addEventListener) {
+          mq.addEventListener('change', function () {
+            if (loadTheme() === 'system') {
+              applyTheme('system');
+            }
+          });
+        } else if (mq.addListener) {
+          mq.addListener(function () {
+            if (loadTheme() === 'system') {
+              applyTheme('system');
+            }
+          });
+        }
+      }
+    })();
+
+    (function () {
+      'use strict';
+
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.querySelector('.sidebar-toggle');
+      const links = document.querySelectorAll('.sidebar-nav a');
+      const sections = document.querySelectorAll('main section[id]');
+
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          const isOpen = sidebar.classList.toggle('open');
+          toggle.setAttribute('aria-expanded', String(isOpen));
+        });
+      }
+
+      function setActive(id) {
+        links.forEach(function (link) {
+          if (link.getAttribute('href') === '#' + id) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'true');
+          } else {
+            link.classList.remove('active');
+            link.removeAttribute('aria-current');
+          }
+        });
+      }
+
+      if ('IntersectionObserver' in window && sections.length > 0) {
+        const observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              setActive(entry.target.id);
+            }
+          });
+        }, {
+          rootMargin: '-20% 0px -70% 0px',
+          threshold: 0
+        });
+
+        sections.forEach(function (section) {
+          observer.observe(section);
+        });
+      } else {
+        // Fallback: highlight first link.
+        if (links.length > 0) {
+          setActive(links[0].getAttribute('href').slice(1));
+        }
+      }
+
+      sidebar.addEventListener('click', function (event) {
+        const link = event.target.closest('.sidebar-nav a');
+        if (!link) return;
+        if (window.innerWidth <= 860) {
+          sidebar.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+
+    (function () {
+      'use strict';
+
+      const quizData = {{QUIZ_DATA}};
+      const container = document.getElementById('quiz-container');
+      const summary = document.getElementById('quiz-summary');
+      const announcer = document.getElementById('quiz-announce');
+      let answeredCount = 0;
+      let correctCount = 0;
+
+      function hashString(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+          const c = str.charCodeAt(i);
+          h = ((h << 5) - h) + c;
+          h |= 0;
+        }
+        return Math.abs(h);
+      }
+
+      function seededShuffle(array, seed) {
+        const copy = array.slice();
+        let s = seed;
+        for (let i = copy.length - 1; i > 0; i--) {
+          s = (s * 9301 + 49297) % 233280;
+          const j = Math.floor((s / 233280) * (i + 1));
+          const tmp = copy[i];
+          copy[i] = copy[j];
+          copy[j] = tmp;
+        }
+        return copy;
+      }
+
+      function escapeHtml(text) {
+        return String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function renderQuiz() {
+        if (!quizData || quizData.length === 0) {
+          container.innerHTML = '<p>No quiz questions for this change.</p>';
+          return;
+        }
+
+        quizData.forEach(function (q, qIndex) {
+          const seed = hashString(q.question + '-' + new Date().toDateString() + '-' + qIndex);
+          const shuffled = seededShuffle(q.options.map(function (opt, i) {
+            return { text: opt, originalIndex: i };
+          }), seed);
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'quiz-question';
+          wrapper.setAttribute('role', 'group');
+          wrapper.setAttribute('aria-labelledby', 'q-' + qIndex + '-title');
+
+          const title = document.createElement('h4');
+          title.id = 'q-' + qIndex + '-title';
+          title.textContent = (qIndex + 1) + '. ' + q.question;
+          wrapper.appendChild(title);
+
+          const options = document.createElement('div');
+          options.className = 'quiz-options';
+
+          shuffled.forEach(function (item, pos) {
+            const optionId = 'q-' + qIndex + '-o-' + pos;
+            const isCorrect = item.originalIndex === q.correct_index;
+
+            const label = document.createElement('label');
+            label.className = 'quiz-option';
+            label.dataset.correct = String(isCorrect);
+            label.htmlFor = optionId;
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'q-' + qIndex;
+            input.id = optionId;
+            input.value = String(pos);
+            input.setAttribute('aria-label', item.text);
+
+            const text = document.createElement('span');
+            text.className = 'quiz-option-label';
+            text.innerHTML = escapeHtml(item.text);
+
+            label.appendChild(input);
+            label.appendChild(text);
+            options.appendChild(label);
+
+            input.addEventListener('change', function () {
+              handleAnswer(qIndex, label, item.originalIndex, q.explanations, options);
+            });
+          });
+
+          wrapper.appendChild(options);
+
+          const feedback = document.createElement('div');
+          feedback.id = 'q-' + qIndex + '-feedback';
+          feedback.className = 'quiz-feedback';
+          wrapper.appendChild(feedback);
+
+          container.appendChild(wrapper);
+        });
+      }
+
+      function handleAnswer(qIndex, selectedLabel, selectedOriginalIndex, explanations, optionsContainer) {
+        const correct = selectedLabel.dataset.correct === 'true';
+        const allOptions = optionsContainer.querySelectorAll('.quiz-option');
+        const feedback = document.getElementById('q-' + qIndex + '-feedback');
+
+        allOptions.forEach(function (opt) {
+          opt.classList.add('disabled');
+          opt.querySelector('input').disabled = true;
+          if (opt.dataset.correct === 'true') {
+            opt.classList.add('correct');
+          }
+        });
+
+        if (!correct) {
+          selectedLabel.classList.add('incorrect');
+        }
+
+        feedback.className = 'quiz-feedback visible ' + (correct ? 'correct' : 'incorrect');
+        let explanationText = explanations[selectedOriginalIndex] || explanations[q.correct_index] || '';
+        if (correct) {
+          explanationText = explanationText.replace(/^Correct[.:]\s*/i, '');
+        }
+        feedback.innerHTML = '<strong>' + (correct ? 'Correct.' : 'Not quite.') + '</strong> ' +
+          escapeHtml(explanationText);
+
+        announcer.textContent = (correct ? 'Correct.' : 'Incorrect.') + ' ' + explanationText;
+
+        if (correct) correctCount++;
+        answeredCount++;
+
+        if (answeredCount === quizData.length) {
+          summary.classList.add('visible');
+          summary.innerHTML = '<strong>Quiz complete:</strong> ' + correctCount + ' of ' + quizData.length + ' correct.';
+        }
+      }
+
+      renderQuiz();
+    })();
+  </script>
+</body>
+</html>
